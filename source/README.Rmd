@@ -1,0 +1,173 @@
+---
+title: "README"
+author: "Peter Ganong, Pascal Noel, Peter Robertson and Joseph Vavra"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+library(reticulate)
+library(quantreg)
+library(tidyverse)
+library(lubridate)
+library(yaml)
+library(rprojroot)
+library("RColorBrewer")
+matches <- dplyr::matches
+
+make_path <- setwd("~/repo/repkit_UI_calc/") #nolint
+
+#### Read in data ####
+
+fips_codes <- maps::state.fips %>%
+  select(fips,
+         state = abb) %>%
+  select(STATEFIP = fips, state) %>%
+  distinct() %>%
+  bind_rows(tibble(state = c("HI", "AK"),
+                   STATEFIP = c(15, 02))) %>%
+  filter(state != "DC",
+         state != "WV")
+
+
+worker_citizen_instate <-
+  read_csv("ASEC_2019.csv") %>%
+  filter(INCWAGE < 99999998,
+         INCWAGE > 0,
+         CITIZEN != 5) %>%
+  inner_join(fips_codes)
+
+wages <- worker_citizen_instate %>%
+  transmute(state,
+            fips = STATEFIP,
+            weight = ASECWT,
+            wage = INCWAGE,
+            employment_status = EMPSTAT,
+            unemployment_duration = DURUNEMP,
+            weeks_worked = WKSWORK1,
+            usual_hours = UHRSWORKLY,
+            unemp_reason = WHYUNEMP) %>%
+  filter(wage >= (7.25 * usual_hours * weeks_worked))
+
+
+rm(worker_citizen_instate)
+```
+
+
+This repository contains the UI calculator that is used in Ganong, Noel and Vavra (2020). The calculator can be used to find the benefits of a worker without dependendents as of January 2020. The calculator is written in Python 2.7 so can be used from Python, R and Stata. This document outlines the use of the code in R. A dictionary of the inputs to the calculator can be found in `data_dict.md`.
+
+The reticulate package can be used to call Python functions from R. The code below loads the calculator.
+
+
+```{r load reticulate}
+library(reticulate)
+use_condaenv()
+source_python("source/ui_calculator.py")
+```
+
+The function `calc_weekly_state_quarterly(q1, q2, q3, q4, states)` can be used to calculate benefits.
+
+It accepts numeric vectors or lists of earnings in the 4 quarters of the base period and a character vector or list of the states of residence of workers. It returns a numeric list of benefits. The calculator can be used with the standard 2 digit codes of all states excluding West Virginia. 
+
+Because the benefits are returned as a list, you may find it helpful to combine the function with another function which converts a list of numerics to a vector e.g. `purrr::map_dbl(x, 1)`, `purrr::flatten_dbl(x)` or `unlist(x)`.
+
+Below we show how you might use the function with an annual wage income data, `wage`, and `weeks_worked` to construct an estimate of benefits. Specifically here we are alloting the annual earnings into quarters by assuming the agent worked consecutive weeks ending the final week of 2018. We then use the benefits calculator on those imputed quarterly earnings. 
+
+
+```{r example wages, cache=TRUE}
+library(tidyverse)
+
+wages <- wages %>%
+  mutate(weekly_earnings = wage/weeks_worked,
+         q1_earnings = weeks_worked - 39,
+         q2_earnings = weeks_worked - 26,
+         q3_earnings = weeks_worked - 13,
+         q4_earnings = weeks_worked) %>%  
+  mutate_at(vars(matches("q[1-4]_earnings" )), ~ case_when(.x > 13 ~ 13*weekly_earnings,
+                                                           .x < 0 ~ 0,
+                                                           TRUE ~ .x*weekly_earnings)) %>%
+  mutate(benefits_amount = calc_weekly_state_quarterly(q1_earnings,
+                                                       q2_earnings,
+                                                       q3_earnings,
+                                                       q4_earnings,
+                                                       state) %>% map_dbl(1))
+```
+
+Below we show how the UI benefits we calculate using the calculator on the CPS compare to the benefits that are reported by the Departmented of Labor in their UI Replacement Rates Report. The report uses uses Unemployment Insurance Benefit Accuracy Measurement (BAM) data. Note that the BAM has an average sample size of less than 500 per state, so there is likly sampling variability in both our estimates and the benchmarks. 
+
+```{r benchmark, echo=FALSE, message=FALSE, warning=FALSE}
+fit_quantiles_state <- function(tau){
+  wages %>%
+    mutate(eligible = (employment_status == 21 & unemployment_duration <= 12 & unemp_reason %in% c(1, 2))) %>%
+    filter( benefits_amount > 0) %>%
+    rq(weekly_earnings ~  eligible + state, tau = tau, weights = weight, data = . ) %>%
+    broom::augment(newdata = tibble(state = fips_codes$state,
+                                    eligible = TRUE))
+}
+
+projected_earnings_dist <- map_dfr(c(seq(0.05, 0.95, 0.05), 0.99), fit_quantiles_state)
+
+CPS_values <- projected_earnings_dist %>%
+  rename(wage = .fitted, tau = .tau) %>%
+  pivot_wider(names_from = tau, values_from = wage) %>%
+  right_join(wages) %>%
+  filter((employment_status == 21 & unemployment_duration <= 12 & unemp_reason %in% c(1, 2)) |
+           employment_status == 10,
+         benefits_amount > 0) %>%
+  mutate_at(vars(contains(".")),
+            ~ . < weekly_earnings) %>%
+  filter(!`0.99`) %>%
+  group_by_at(vars(contains("."))) %>%
+  group_by(state, add = TRUE) %>%
+  mutate(weight = weight/sum(weight)) %>%
+  group_by(state) %>%
+  summarise(aww = Hmisc::wtd.mean(wage/weeks_worked,
+                                  weights = weight),
+            awba  = Hmisc::wtd.mean(benefits_amount,
+                                    weights = weight),
+            rr1 = Hmisc::wtd.mean(benefits_amount/weekly_earnings,
+                                  weights = weight),
+            source = "CPS")
+
+benchmarks <- read_csv("BAM_2018_benchmarks.csv") %>%
+  mutate_at(c("wba", "earnings"), ~ str_remove_all(., "\\$|,") %>%
+              as.numeric()) %>%
+  transmute(aww = earnings,
+            awba = wba,
+            rr1 = rr1,
+            state = State,
+            source = "BAM")
+
+
+benchmarks_for_plot <- benchmarks %>%
+  bind_rows(CPS_values) %>%
+  pivot_longer(cols = c("aww", "awba", "rr1"),
+               names_to = "type",
+               values_to = "amount") %>%
+  pivot_wider(names_from = source,
+              values_from = amount)
+
+
+benchmarks_for_plot  %>%
+  filter(type %in% c("awba", "aww")) %>%
+  ggplot() +
+  aes(BAM, CPS) +
+  geom_text(aes(label = state)) +
+  geom_abline() +
+  geom_abline(slope = 0.85,
+              colour = "red",
+              alpha = 0.8) +
+  geom_abline(slope = 1.15,
+              colour = "red",
+              alpha = 0.8) +
+  labs(x = "Benchmarks from Department of Labor",
+       y = "Our calculations from Current Population Survey") +
+  facet_wrap(~type, labeller = labeller(type = c(aww = "Average weekly wage",
+                                                 awba = "Average benefit amount")),
+             scales = "free") +
+  scale_x_continuous(labels = scales::dollar) +
+  scale_y_continuous(labels = scales::dollar)
+
+```

@@ -1,0 +1,31 @@
+name: for_calc
+channels:
+  - defaults
+dependencies:
+  - blas=1.0=mkl
+  - ca-certificates=2020.1.1=0
+  - certifi=2020.4.5.1=py37_0
+  - icc_rt=2019.0.0=h0cc432a_1
+  - intel-openmp=2020.1=216
+  - mkl=2020.1=216
+  - mkl-service=2.3.0=py37hb782905_0
+  - mkl_fft=1.0.15=py37h14836fe_0
+  - mkl_random=1.1.0=py37h675688f_0
+  - numpy=1.18.1=py37h93ca92e_0
+  - numpy-base=1.18.1=py37hc3f5095_1
+  - openssl=1.1.1g=he774522_0
+  - pandas=1.0.3=py37h47e9c7a_0
+  - pip=20.0.2=py37_3
+  - python=3.7.7=h81c818b_4
+  - python-dateutil=2.8.1=py_0
+  - pytz=2020.1=py_0
+  - setuptools=46.2.0=py37_0
+  - six=1.14.0=py37_0
+  - sqlite=3.31.1=h2a8f88b_1
+  - vc=14.1=h0510ff6_4
+  - vs2015_runtime=14.16.27012=hf0eaf9b_1
+  - wheel=0.34.2=py37_0
+  - wincertstore=0.2=py37_0
+  - zlib=1.2.11=h62dcd97_4
+prefix: C:\Users\probert2\AppData\Local\Continuum\anaconda3\envs\for_calc
+
