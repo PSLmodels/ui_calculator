@@ -61,7 +61,7 @@ Benchmarks source: Unemployment Insurance Benefit Accuracy Measurement data
 
 The calculator computes the benefits of a worker without dependendents as of January 2020. It also can be used to simulate alternative policies, such as Federal Pandemic Unemployment Compensation.
 
-Many states have complex UI benefit rules. We follow the rules described in ["Significant Provisions of State Unemployment Laws"](https://oui.doleta.gov/unemploy/content/sigpros/2020-2029/January2020.pdf). This document, and therefore our calculator, do not capture every aspect of a state's UI rules. A dictionary of the features used by the calculator can be found in [`data_dict.md`](data_dict.md). 
+Many states have complex UI benefit rules. We follow the rules described in ["Significant Provisions of State Unemployment Laws"](https://oui.doleta.gov/unemploy/content/sigpros/2020-2029/January2020.pdf). If a state has multiple ways of satisfying eligibility or multiple ways of calculating benefits, we include only the first listed way. This document, and therefore our calculator, do not capture every aspect of a state's UI rules. A dictionary of the features used by the calculator can be found in [`data_dict.md`](data_dict.md). 
 
 
 ### Acknowledgements
