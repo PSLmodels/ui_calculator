@@ -63,6 +63,12 @@ The calculator computes the benefits of a worker without dependendents as of Jan
 
 Many states have complex UI benefit rules. We follow the rules described in ["Significant Provisions of State Unemployment Laws"](https://oui.doleta.gov/unemploy/content/sigpros/2020-2029/January2020.pdf). This document, and therefore our calculator, do not capture every aspect of a state's UI rules. A dictionary of the features used by the calculator can be found in [`data_dict.md`](data_dict.md). 
 
+
+### Acknowledgements
+If you find a problem, please open a github issue or even better propose a fix using a pull request. 
+
+Thank you to Maya Sweedler for helpful feedback.
+
 ### License
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
