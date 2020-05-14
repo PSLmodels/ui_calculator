@@ -1,4 +1,4 @@
-cd C:\Users\probert2\Documents\repo\covid_inc_sprt\issues\issue_9_repkit\
+cd ~/Documents/repo/ui_calculator 
 clear 
 import delimited "example_annual.csv"
 

@@ -1,8 +1,12 @@
 library(reticulate)
 library(tidyverse)
 
-use_condaenv("C:\\Users\\probert2\\AppData\\Local\\Continuum\\anaconda3\\envs\\for_calc")
-#You could also replace this with use_python()
+setwd("~/repo/ui_calculator/")
+
+#point this to a conda environment that includes numpy and pandas. The YAML export of the environment
+#we used is in the source folder.
+use_condaenv() #You could also replace this with use_python()
+
 
 source_python("source/ui_calculator.py")
 
