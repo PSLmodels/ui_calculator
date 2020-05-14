@@ -2,15 +2,16 @@ UI Calculator for Ganong, Noel and Vavra (2020): Data Dictionary
 ================
 Peter Ganong, Pascal Noel, Peter Robertson and Joseph Vavra
 
-## Computation of Weekly Benefit Amount (state\_thresholds.csv)
+## Computation of Weekly Benefit Amount (`state_thresholds.csv`)
 
-Most states have a linear benefits schedule as a function of some
-measure of earnings (`base_wage`) which is subject to a maximum (`max`)
-and minimum (`min`) benefit amount. That is we define:
+Every state computes benefits using a `rate`, which is the ratio of
+weekly benefits to a measure of prior earnings (`base_wage`). We
+calculate:
 
 `wba_formula = base_wage*rate + intercept`
 
-and caclulate:
+This computation is subject to a maximum (`max`) and minimum (`min`)
+benefit amount.
 
 | Scenario                  | Weekly Benefit Amount |
 | ------------------------- | --------------------- |
@@ -19,9 +20,10 @@ and caclulate:
 | `wba_formula` \> `max`    | `max`                 |
 
 The `wage_concept` records how the `base_wage` should be calculated and
-has five possible values:
+has five possible
+values:
 
-| `wage_concept` | Value of of `base_wage`                                             |
+| `wage_concept` | Value of `base_wage`                                                |
 | -------------- | ------------------------------------------------------------------- |
 | `annual_wage`  | annual wages                                                        |
 | `hqw`          | wages in highest quarter                                            |
@@ -33,9 +35,10 @@ Finally, some states have different benefits schedules depending on
 whether the income of an applicant is over a particular threshold. This
 is captured by `inc_thresh`. The `inc_thresh` variable records the
 minimum income as measured in the `wage_concept` for that row, such that
-the rules in that row should be applied to calculate benefits.
+the rules in that row should be applied to calculate
+benefits.
 
-## Earnings/ Employment Needed in Base Period to Qualify (state\_eligibility.csv)
+## Earnings/ Employment Needed in Base Period to Qualify (`state_eligibility.csv`)
 
 We assume that the base period is the calendar year of 2018. We do this
 because it matches what we observe in the CPS. This would correspond to
@@ -51,7 +54,8 @@ WI.”
 
 We include variables which enforce the following conitions. Most states
 include only some of these conditions in their eligibility checks, so
-the majority of values in `state_eligibility.csv` are `0`.
+the majority of values in `state_eligibility.csv` are
+`0`.
 
 | Variable            | Criterion                                                                                      |
 | ------------------- | ---------------------------------------------------------------------------------------------- |
