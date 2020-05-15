@@ -2,26 +2,28 @@ UI Calculator for Ganong, Noel and Vavra (2020): Data Dictionary
 ================
 Peter Ganong, Pascal Noel, Peter Robertson and Joseph Vavra
 
-## Computation of Weekly Benefit Amount (state\_thresholds.csv)
+## Computation of Weekly Benefit Amount (`state_thresholds.csv`)
 
-Most states have a linear benefits schedule as a function of some
-measure of earnings (`base_wage`) which is subject to a maximum (`max`)
-and minimum (`min`) benefit amount. That is we define:
+Every state computes benefits using a `rate`, which is the ratio of
+weekly benefits to a measure of prior earnings (`base_wage`). We
+calculate:
 
 `wba_formula = base_wage*rate + intercept`
 
-and caclulate:
+This computation is subject to a maximum (`max`) and minimum (`min`)
+benefit amount.
 
 | Scenario                  | Weekly Benefit Amount |
 | ------------------------- | --------------------- |
-| `wba_formula < min`       | `min`                 |
-| `min < wba_formula < max` | `wba_formula`         |
-| `wba_formula` \> `max`    | `max`                 |
+| `wba_formula` < `min`       | `min`                 |
+| `min` < `wba_formula` < `max` | `wba_formula`         |
+| `wba_formula` > `max`    | `max`                 |
 
 The `wage_concept` records how the `base_wage` should be calculated and
-has five possible values:
+has five possible
+values:
 
-| `wage_concept` | Value of of `base_wage`                                             |
+| `wage_concept` | Value of `base_wage`                                                |
 | -------------- | ------------------------------------------------------------------- |
 | `annual_wage`  | annual wages                                                        |
 | `hqw`          | wages in highest quarter                                            |
@@ -33,9 +35,10 @@ Finally, some states have different benefits schedules depending on
 whether the income of an applicant is over a particular threshold. This
 is captured by `inc_thresh`. The `inc_thresh` variable records the
 minimum income as measured in the `wage_concept` for that row, such that
-the rules in that row should be applied to calculate benefits.
+the rules in that row should be applied to calculate
+benefits.
 
-## Earnings/ Employment Needed in Base Period to Qualify (state\_eligibility.csv)
+## Earnings/ Employment Needed in Base Period to Qualify (`state_eligibility.csv`)
 
 We assume that the base period is the calendar year of 2018. We do this
 because it matches what we observe in the CPS. This would correspond to
@@ -51,7 +54,8 @@ WI.”
 
 We include variables which enforce the following conitions. Most states
 include only some of these conditions in their eligibility checks, so
-the majority of values in `state_eligibility.csv` are `0`.
+the majority of values in `state_eligibility.csv` are
+`0`.
 
 | Variable            | Criterion                                                                                      |
 | ------------------- | ---------------------------------------------------------------------------------------------- |
@@ -66,3 +70,15 @@ the majority of values in `state_eligibility.csv` are `0`.
 | `wba_2hqw`          | minimum earnings in two highest quarters as a multiple of the weekly benefit amount            |
 | `abs_2hqw`          | minimum dollar amount in two highest quarters                                                  |
 | `hqw_2hqw`          | minimum in two highest quarters as multiple of high quarter wages                              |
+
+## State Specific Notes
+
+Colorado, Iowa, Minnesota, Ohio and Wyoming all include statewide averages as part of their calculations. We use averages [from the BLS](https://www.bls.gov/oes/current/oessrcst.htm).
+
+Colorado, Minnesota and New York have benefits schedules which change if the worker's income is in excess of a particular amount. We include the `inc_thresh` variable explained above to account for this. 
+
+New Hampshire benefits are set to 1% of annual wages. This is the lower bound of the range of 1% - 1.1% in the Significant Provisions document. We could not readily find information on how the range between 1% and 1.1% is determined.
+
+North Dakota has a `wage_concept` which is not common to any other states and is coded as `ND` and described in the `wage_concept` table above.
+
+Alaska, Pennsylvania and Utah all have replacment rates which vary with income as a result of a fixed payment (or deduction) from the benefit. This is coded in the `intercept` column. 

@@ -4,13 +4,14 @@ author: "Peter Ganong, Pascal Noel, Peter Robertson and Joseph Vavra"
 output: github_document
 ---
 
-## Computation of Weekly Benefit Amount (state_thresholds.csv)
+## Computation of Weekly Benefit Amount (`state_thresholds.csv`)
 
-Most states have a linear benefits schedule as a function of some measure of earnings (`base_wage`) which is subject to a maximum (`max`) and minimum (`min`) benefit amount. That is we define: 
+Every state computes benefits using a `rate`, which is the ratio of weekly benefits to 
+a measure of prior earnings (`base_wage`). We calculate: 
 
 `wba_formula = base_wage*rate + intercept`
 
-and caclulate:
+This computation is subject to a maximum (`max`) and minimum (`min`) benefit amount. 
 
 Scenario | Weekly Benefit Amount
 --- | ---
@@ -18,10 +19,9 @@ Scenario | Weekly Benefit Amount
 `min < wba_formula < max` | `wba_formula`
 `wba_formula` > `max` | `max`
 
-
 The `wage_concept` records how the `base_wage` should be calculated and has five possible values:
 
-`wage_concept` | Value of of `base_wage`
+`wage_concept` | Value of `base_wage`
 --- | --- 
 `annual_wage` | annual wages
 `hqw` | wages in highest quarter
@@ -32,7 +32,7 @@ The `wage_concept` records how the `base_wage` should be calculated and has five
 Finally, some states have different benefits schedules depending on whether the income of an applicant is over a particular threshold. This is captured by `inc_thresh`. The `inc_thresh` variable records the minimum income as measured in the `wage_concept` for that row, such that the rules in that row should be applied to calculate benefits.   
 
 
-## Earnings/ Employment Needed in Base Period to Qualify (state_eligibility.csv)
+## Earnings/ Employment Needed in Base Period to Qualify (`state_eligibility.csv`)
 We assume that the base period is the calendar year of 2018. We do this because it matches what we observe in the CPS. This would correspond to the standard base period for an applicant in April, May or June of 2019. The DoL summary document for UI benefit rules says 
 “Almost all qualifying earnings are determined using a base period consisting of the first four of the last five completed CQs. A few States use a different base period. In the following states, more recent earnings may be used in an alternative base period under certain conditions: AK, AR, CA, CO, CT, DE, DC, GA, HI, ID, IL, IA, KS, ME, MD, MA, MI, MN, MT, NE, NV, NH, NJ, NM, NY, NC, OH, OK, OR, PR, RI, SC, SD, UT, VT, VA, VI, WA, WV, and WI.”
 
