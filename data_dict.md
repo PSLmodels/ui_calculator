@@ -15,9 +15,9 @@ benefit amount.
 
 | Scenario                  | Weekly Benefit Amount |
 | ------------------------- | --------------------- |
-| `wba_formula < min`       | `min`                 |
-| `min < wba_formula < max` | `wba_formula`         |
-| `wba_formula` \> `max`    | `max`                 |
+| `wba_formula` < `min`       | `min`                 |
+| `min` < `wba_formula` < `max` | `wba_formula`         |
+| `wba_formula` > `max`    | `max`                 |
 
 The `wage_concept` records how the `base_wage` should be calculated and
 has five possible
@@ -71,12 +71,13 @@ the majority of values in `state_eligibility.csv` are
 | `abs_2hqw`          | minimum dollar amount in two highest quarters                                                  |
 | `hqw_2hqw`          | minimum in two highest quarters as multiple of high quarter wages                              |
 
-## State Specific Notes:
+## State Specific Notes
+
 Colorado, Iowa, Minnesota, Ohio and Wyoming all include statewide averages as part of their calculations. We use averages [from the BLS](https://www.bls.gov/oes/current/oessrcst.htm).
 
 Colorado, Minnesota and New York have benefits schedules which change if the worker's income is in excess of a particular amount. We include the `inc_thresh` variable explained above to account for this. 
 
-New Hampshire benefits are set to 1%, of annual wages the lower bound of the range of 1% - 1.1% in the Significant Provisions document. We could not readily find information on how the range between 1% and 1.1% is determined.
+New Hampshire benefits are set to 1% of annual wages. This is the lower bound of the range of 1% - 1.1% in the Significant Provisions document. We could not readily find information on how the range between 1% and 1.1% is determined.
 
 North Dakota has a `wage_concept` which is not common to any other states and is coded as `ND` and described in the `wage_concept` table above.
 
