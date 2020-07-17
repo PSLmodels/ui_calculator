@@ -55,15 +55,15 @@ wages <- worker_citizen_instate %>%
             weeks_worked = WKSWORK1,
             usual_hours = UHRSWORKLY,
             unemp_reason = WHYUNEMP) %>%
-  mutate(weekly_earnings = wage/weeks_worked,
+  mutate(weekly_earnings = wage / weeks_worked,
          q1_earnings = weeks_worked - 39,
          q2_earnings = weeks_worked - 26,
          q3_earnings = weeks_worked - 13,
          q4_earnings = weeks_worked) %>%
-  mutate_at(vars(matches("q[1-4]_earnings" )), ~ case_when(
-    .x > 13 ~ 13*weekly_earnings,
-    .x < 0 ~ 0,
-    TRUE ~ .x*weekly_earnings)) %>%
+  mutate_at(vars(matches("q[1-4]_earnings")),
+            ~ case_when(.x > 13 ~ 13*weekly_earnings,
+                        .x < 0 ~ 0,
+                        TRUE ~ .x*weekly_earnings)) %>%
   filter(wage >= (7.25 * usual_hours * weeks_worked))
 
 
@@ -113,13 +113,13 @@ CPS_values <- projected_earnings_dist %>%
   filter(!`0.99`) %>%
   group_by_at(vars(contains("."))) %>%
   group_by(state, add = TRUE) %>%
-  mutate(weight = weight/sum(weight)) %>%
+  mutate(weight = weight / sum(weight)) %>%
   group_by(state) %>%
-  summarise(aww = Hmisc::wtd.mean(wage/weeks_worked,
+  summarise(aww = Hmisc::wtd.mean(wage / weeks_worked,
                                   weights = weight),
             awba  = Hmisc::wtd.mean(benefits_amount,
                                     weights = weight),
-            rr1 = Hmisc::wtd.mean(benefits_amount/weekly_earnings,
+            rr1 = Hmisc::wtd.mean(benefits_amount / weekly_earnings,
                                   weights = weight),
             source = "CPS")
 
