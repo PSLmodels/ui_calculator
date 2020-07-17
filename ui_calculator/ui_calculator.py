@@ -7,12 +7,34 @@ Created on Fri Apr 24 15:09:28 2020
 
 import pandas as pd
 import numpy as np
+import os
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    # Try backported to PY<37 `importlib_resources`.
+    import importlib_resources as pkg_resources
+
+# from . import data  # Data folder using importlib_resources.
 
 #This CSV contains the parameters needed to calculate benefits amount
-state_rules = pd.read_csv("source/state_thresholds.csv")
+#state_rules = pd.read_csv(pkg_resources.path('data', 'state_thresholds.csv'))
+
+# state_rules = pd.read_csv(files(data).joinpath("state_thresholds.csv"))
+# state_rules = pd.read_csv("source/state_thresholds.csv")
+
+print(pkg_resources.path("d", "state_eligibility.csv"))
+
+with pkg_resources.open_text("d", "state_eligibility.csv") as fid:
+    alice = fid.readlines()
+
+print(alice)
 
 #This CSV contains the parameters needed to calculate eligibility
-state_eligibility = pd.read_csv("source/state_eligibility.csv")
+# print(pd.read_csv(pkg_resources.path('ui_calculator', 'd/state_eligibility.csv')))
+#state_eligibility = pd.read_csv(pkg_resources.path(
+#    'data', 'state_eligibility.csv'))
+# state_eligibility = pd.read_csv(files(data).joinpath("state_eligibility.csv"))
+# state_eligibility = pd.read_csv("source/state_eligibility.csv")
 
 def calc_weekly_schedule(base_wage, rate, intercept, minimum, maximum):
     '''Finds weekly benefits from wages in a given period, a rate and intercept,
