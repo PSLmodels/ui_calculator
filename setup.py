@@ -12,6 +12,6 @@ setup(name='ui_calculator',
           'numpy',
           'pandas'
       ],
-      zip_safe=False
+      zip_safe=False,
       package_data={'ui_calculator': ['data/*']}
 )
