@@ -35,16 +35,20 @@ def calc_weekly_schedule(base_wage, rate, intercept, minimum, maximum):
     
 
 def is_eligible(base_period, wba, state):
-    
     '''
-    Look up by state, and check eligibility from a list of quarterly earnings in the base period,
-    and a potential weekly benefit amount if they are found to be eligible
+    Look up by state, and check eligibility from a list of quarterly earnings
+    in the base period,and a potential weekly benefit amount if they are found
+    to be eligible
     '''
     try:
-        absolute_base, hqw, absolute_hqw, wba_thresh, num_quarters, outside_high_q, wba_outside_hq, absolute_2nd_high, wba_2hqw, abs_2hqw, hqw_2hqw  = state_eligibility.loc[state_eligibility['state'] == state].iloc[0][1:]
+        (absolute_base, hqw, absolute_hqw, wba_thresh, num_quarters, 
+         outside_high_q, wba_outside_hq, absolute_2nd_high, wba_2hqw, 
+         abs_2hqw, hqw_2hqw) = state_eligibility.loc[
+            state_eligibility['state'] == state].iloc[0][1:]
     except:
         print("""There was an error indexing the dataframe. 
-              Check that your two character state code is is matched by a state code in state_eligibity.csv""")
+              Check that your two character state code is is matched
+              by a state code in state_eligibity.csv""")
         raise
 
 
@@ -75,7 +79,8 @@ def is_eligible(base_period, wba, state):
 def find_base_wage(wage_concept, base_period):
     '''
     from the name of a wage concept and a list of earnings in the base period,
-    calculate the total earnings that are used to calculate benefits in the state
+    calculate the total earnings that are used to calculate benefits in the
+    state
     '''
     
     if wage_concept == "2hqw":
@@ -87,28 +92,33 @@ def find_base_wage(wage_concept, base_period):
     elif wage_concept == "2fqw":
         base_wage = sum(base_period[-2:])
     elif wage_concept == "ND":
-        base_wage = sum((np.sort(base_period))[-2:]) + 0.5*np.sort(base_period)[-3]  
+        base_wage = (sum((np.sort(base_period))[-2:]) +
+                     0.5*np.sort(base_period)[-3])  
     else: 
-        print("The wage concept " + str(wage_concept) + "from state_thresholds.csv is not defined")
-        raise 
+        print("The wage concept " + str(wage_concept) + 
+              "from state_thresholds.csv is not defined")
+        raise
         
             
     return base_wage
 
 def calc_weekly_state(earnings_hist, state):
     '''
-    From quarterly earnings history in chronological order, and a two character state index
-    calculate the weekly benefits.
+    From quarterly earnings history in chronological order, and a two character
+    state index calculate the weekly benefits.
     '''
 
     base_period = earnings_hist[-5:-1]
     
     
     try:
-        wage_concept, rate, intercept,  minimum, maximum, inc_thresh = state_rules.loc[state_rules['state'] == state].iloc[0][1:7]
+        (wage_concept, rate, intercept,  minimum, maximum,
+         inc_thresh) = state_rules.loc[
+            state_rules['state'] == state].iloc[0][1:7]
     except:
         print("""There was an error indexing the dataframe. 
-              Check that your two character state code is is matched by a state code in state_thresholds.csv""")
+              Check that your two character state code is is matched by a state
+              code in state_thresholds.csv""")
         raise
     
     
@@ -117,8 +127,12 @@ def calc_weekly_state(earnings_hist, state):
     #check that the income is above the threshold for the given rules:
     if base_wage < inc_thresh:
 
-        #Redefine the rules variables for the first entry such that the base wage is above the threshold
-        wage_concept, rate, intercept,  minimum, maximum = state_rules.loc[state_rules['state'] == state].loc[base_wage >= state_rules['inc_thresh']].iloc[0][1:6]
+        #Redefine the rules variables for the first entry such that the base
+        #wage is above the threshold
+        (wage_concept, rate, intercept,  minimum,
+         maximum) = state_rules.loc[
+            state_rules['state'] == state].loc[
+                base_wage >= state_rules['inc_thresh']].iloc[0][1:6]
         
         #find the basewage on the alternate concept
         base_wage = find_base_wage(wage_concept, base_period)
@@ -141,16 +155,18 @@ def calc_weekly_state_quarterly(q1, q2, q3, q4, states):
     ineligible)
     '''
     try:
-        len(q1)
+        nrow = len(q1)
     except:
        assert type(states) is str, "Check that you have one state per worker"  
        return calc_weekly_state([q1, q2, q3, q4, 0], states)
     try:
-        assert (type(states) != str) & (len(states) > 0) & (len(states) == len(q1)), "Check that you have one state per worker"        
+        assert ((type(states) != str) & (len(states) > 0) &
+                (len(states) == len(q1))), \
+               "Check that you have one state per worker"        
     except: 
         raise Exception('Check that you have one state per worker')
 
-    earnings_history = [[q1[i], q2[i], q3[i], q4[i], 0] for i in range(len(q1))]
+    earnings_history = [[q1[i], q2[i], q3[i], q4[i], 0] for i in range(nrow)]
         
-    return [calc_weekly_state(earnings_history[i], states[i]) for i in range(len(states))]
-    
+    return [calc_weekly_state(earnings_history[i], states[i]) 
+            for i in range(nrow)]
