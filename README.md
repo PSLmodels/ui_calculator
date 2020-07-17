@@ -47,9 +47,9 @@ example %>%
 | 88000| 52 | AZ | 240
 | 35000 | 52 | NV | 350
 
-The worker in Indiana does not meet the eligibility requirements so recieves 0. The worker in Arizona recieves the maximum benefit amount of 240. The worker in Nevada recieves 1/25th of their highest quarter wage, which we calculate to be $350.
+The worker in Indiana does not meet the eligibility requirements so receives 0. The worker in Arizona recieves the maximum benefit amount of 240. The worker in Nevada recieves 1/25th of their highest quarter wage, which we calculate to be $350.
 
-The `calc_weekly_state_quarterly` returns benefits as a list, so you may find  it helpful to combine the function with another function which converts a list of numerics to a vector e.g. `purrr::map_dbl(x, 1)`, `purrr::flatten_dbl(x)` or `unlist(x)`.
+The `calc_weekly_state_quarterly` returns benefits as a list, so you may find it helpful to combine the function with another function which converts a list of numerics to a vector e.g. `purrr::map_dbl(x, 1)`, `purrr::flatten_dbl(x)` or `unlist(x)`.
 
 ### Comparison of estimated benefits from calculator to actual benefits
 

@@ -95,7 +95,7 @@ wages <- wages %>%
                                                        state) %>% map_dbl(1))
 ```
 
-Below we show how the UI benefits we calculate using the calculator on the CPS compare to the benefits that are reported by the Departmented of Labor in their UI Replacement Rates Report. The report uses uses Unemployment Insurance Benefit Accuracy Measurement (BAM) data. Note that the BAM has an average sample size of less than 500 per state, so there is likly sampling variability in both our estimates and the benchmarks. 
+Below we show how the UI benefits we calculate using the calculator on the CPS compare to the benefits that are reported by the Department of Labor in their UI Replacement Rates Report. The report uses uses Unemployment Insurance Benefit Accuracy Measurement (BAM) data. Note that the BAM has an average sample size of less than 500 per state, so there is likly sampling variability in both our estimates and the benchmarks. 
 
 ```{r benchmark, echo=FALSE, message=FALSE, warning=FALSE}
 fit_quantiles_state <- function(tau){

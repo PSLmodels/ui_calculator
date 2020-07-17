@@ -8,7 +8,7 @@ Created on Fri Apr 24 15:09:28 2020
 import pandas as pd
 import numpy as np
 
-#This CSV contians the parameters needed to caclulate benefits amount
+#This CSV contains the parameters needed to calculate benefits amount
 state_rules = pd.read_csv("source/state_thresholds.csv")
 
 #This CSV contains the parameters needed to calculate eligibility
