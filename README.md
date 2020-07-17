@@ -7,6 +7,11 @@ and Vavra (2020)](https://cpb-us-w2.wpmucdn.com/voices.uchicago.edu/dist/1/801/f
 
 The calculator can be used from Python, R and Stata. Above, you will find minimum working examples for each language.
 
+To install it, run:
+```
+pip install git+https://github.com/ganong-noel/ui_calculator.git
+```
+
 The core of the calculator is a Python function `calc_weekly_state_quarterly`. 
 * Inputs: `q1_earnings, q2_earnings, q3_earnings, q4_earnings, state`
 * Output: weekly benefit amount (`wba`)
