@@ -25,9 +25,6 @@ python
 from sfi import Data
 
 import pandas as pd
-import sys
-sys.path.insert(0, './source/')
-
 from ui_calculator import calc_weekly_state_quarterly
 
 benefits = calc_weekly_state_quarterly(
