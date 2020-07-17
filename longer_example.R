@@ -7,7 +7,8 @@ library(rprojroot)
 library("RColorBrewer")
 matches <- dplyr::matches
 
-setwd("~/repo/ui_calculator/")
+# Set as needed.
+#setwd("~/repo/ui_calculator/")
 
 
 #the benefits calculator is written in python.
@@ -16,10 +17,10 @@ setwd("~/repo/ui_calculator/")
 #which takes 4 quarters of total earnings as the first four arguments
 #and state as a 5th argument and returns a weekly benefit amount.
 library(reticulate)
-#point this to a conda environment that includes numpy and pandas. The YAML export of the environment
-#we used is in the source folder.
-use_condaenv() #You could also replace this with use_python()
-source_python("source/ui_calculator.py")
+#point this to a conda environment that includes numpy and pandas.
+#The YAML export of the environment we used is in the source folder.
+#use_condaenv() #You could also replace this with use_python()
+ui_calculator = import("ui_calculator")
 
 palette <- RColorBrewer::brewer.pal(6, "Blues")
 
@@ -59,9 +60,10 @@ wages <- worker_citizen_instate %>%
          q2_earnings = weeks_worked - 26,
          q3_earnings = weeks_worked - 13,
          q4_earnings = weeks_worked) %>%
-  mutate_at(vars(matches("q[1-4]_earnings" )), ~ case_when(.x > 13 ~ 13*weekly_earnings,
-                                                           .x < 0 ~ 0,
-                                                           TRUE ~ .x*weekly_earnings)) %>%
+  mutate_at(vars(matches("q[1-4]_earnings" )), ~ case_when(
+    .x > 13 ~ 13*weekly_earnings,
+    .x < 0 ~ 0,
+    TRUE ~ .x*weekly_earnings)) %>%
   filter(wage >= (7.25 * usual_hours * weeks_worked))
 
 
@@ -73,32 +75,38 @@ rm(worker_citizen_instate)
 #### Add weekly benefits to dataframe ####
 #NB: this code is slow and should be expected to take 1-2 mins
 wages <- wages %>%
-  mutate(benefits_amount = calc_weekly_state_quarterly(q1_earnings,
-                                                       q2_earnings,
-                                                       q3_earnings,
-                                                       q4_earnings,
-                                                       state) %>% map_dbl(1))
+  mutate(benefits_amount =
+         ui_calculator$calc_weekly_state_quarterly(q1_earnings,
+                                                   q2_earnings,
+                                                   q3_earnings,
+                                                   q4_earnings,
+                                                   state) %>% map_dbl(1))
 
 
 
 ### Benchmark Payments ####
 fit_quantiles_state <- function(tau){
   wages %>%
-    mutate(eligible = (employment_status == 21 & unemployment_duration <= 12 & unemp_reason %in% c(1, 2))) %>%
+    mutate(eligible = (employment_status == 21 & 
+                       unemployment_duration <= 12 & 
+                       unemp_reason %in% c(1, 2))) %>%
     filter( benefits_amount > 0) %>%
-    rq(weekly_earnings ~  eligible + state, tau = tau, weights = weight, data = . ) %>%
-    broom::augment(newdata = tibble(state = fips_codes$state,
-                                    eligible = TRUE))
+    rq(weekly_earnings ~  eligible + state, tau = tau, weights = weight,
+       data = . ) %>%
+    broom::augment(newdata = tibble(state = fips_codes$state, eligible = TRUE))
 }
 
-projected_earnings_dist <- map_dfr(c(seq(0.05, 0.95, 0.05), 0.99), fit_quantiles_state)
+projected_earnings_dist <- map_dfr(c(seq(0.05, 0.95, 0.05), 0.99), 
+  fit_quantiles_state)
 
 CPS_values <- projected_earnings_dist %>%
   rename(wage = .fitted, tau = .tau) %>%
   pivot_wider(names_from = tau, values_from = wage) %>%
   right_join(wages) %>%
-  filter((employment_status == 21 & unemployment_duration <= 12 & unemp_reason %in% c(1, 2)) |
-           employment_status == 10,
+  filter((employment_status == 21 & 
+          unemployment_duration <= 12 & 
+          unemp_reason %in% c(1, 2)) |
+         employment_status == 10,
          benefits_amount > 0) %>%
   mutate_at(vars(contains(".")),
             ~ . < weekly_earnings) %>%
@@ -148,11 +156,9 @@ benchmarks_for_plot  %>%
               alpha = 0.8) +
   labs(x = "Benchmarks from Department of Labor",
        y = "Our calculations from Current Population Survey") +
-  facet_wrap(~type, labeller = labeller(type = c(aww = "Average weekly wage",
-                                                 awba = "Average benefit amount")),
+  facet_wrap(~type,
+             labeller = labeller(type = c(aww = "Average weekly wage",
+                                          awba = "Average benefit amount")),
              scales = "free") +
   scale_x_continuous(labels = scales::dollar) +
   scale_y_continuous(labels = scales::dollar)
-
-
-
