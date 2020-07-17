@@ -27,7 +27,7 @@ The core of the calculator is a Python function `calc_weekly_state_quarterly`.
 ``` r
 library(reticulate) #package to call Python functions from R.
 use_condaenv()
-source_python("source/ui_calculator.py")
+ui_calculator = import("ui_calculator")
 library(tidyverse)
 
 example %>%
@@ -36,14 +36,16 @@ example %>%
          q2_earnings = weeks_worked - 26,
          q3_earnings = weeks_worked - 13,
          q4_earnings = weeks_worked) %>%  
-  mutate_at(vars(matches("q[1-4]_earnings" )), ~ case_when(.x > 13 ~ 13*weekly_earnings,
-                                                           .x < 0 ~ 0,
-                                                           TRUE ~ .x*weekly_earnings)) %>%
-  mutate(benefits_amount = calc_weekly_state_quarterly(q1_earnings,
-                                                       q2_earnings,
-                                                       q3_earnings,
-                                                       q4_earnings,
-                                                       state) %>% map_dbl(1))
+  mutate_at(vars(matches("q[1-4]_earnings" )),
+            ~ case_when(.x > 13 ~ 13*weekly_earnings,
+                        .x < 0 ~ 0,
+                        TRUE ~ .x*weekly_earnings)) %>%
+  mutate(benefits_amount =
+         ui_calculator$calc_weekly_state_quarterly(q1_earnings,
+                                                   q2_earnings,
+                                                   q3_earnings,
+                                                   q4_earnings,
+                                                   state) %>% map_dbl(1))
 ```
 
 | Annual earnings | Annual weeks worked | State | Weekly benefits |
