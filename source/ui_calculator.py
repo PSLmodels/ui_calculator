@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr 24 15:09:28 2020
-
 @author: probert2
 """
 
@@ -64,7 +63,7 @@ def is_eligible(base_period, wba, state):
     
     return True
  
-def find_base_wage(wage_concept, base_period):
+def find_base_wage(wage_concept, base_period, weeks_worked):
     '''
     from the name of a wage concept and a list of earnings in the base period,
     calculate the total earnings that are used to calculate benefits in the state
@@ -80,6 +79,8 @@ def find_base_wage(wage_concept, base_period):
         base_wage = sum(base_period[-2:])
     elif wage_concept == "ND":
         base_wage = sum((np.sort(base_period))[-2:]) + 0.5*np.sort(base_period)[-3]  
+    elif wage_concept == "direct_weekly":
+        base_wage = sum(base_period)/weeks_worked
     else: 
         print("The wage concept " + str(wage_concept) + "from state_thresholds.csv is not defined")
         raise 
@@ -87,7 +88,7 @@ def find_base_wage(wage_concept, base_period):
             
     return base_wage
 
-def calc_weekly_state(earnings_hist, state):
+def calc_weekly_state(earnings_hist, state, weeks_worked):
     '''
     From quarterly earnings history in chronological order, and a two character state index
     calculate the weekly benefits.
@@ -104,7 +105,7 @@ def calc_weekly_state(earnings_hist, state):
         raise
     
     
-    base_wage = find_base_wage(wage_concept, base_period)
+    base_wage = find_base_wage(wage_concept, base_period, weeks_worked)
     
     #check that the income is above the threshold for the given rules:
     if base_wage < inc_thresh:
@@ -113,7 +114,7 @@ def calc_weekly_state(earnings_hist, state):
         wage_concept, rate, intercept,  minimum, maximum = state_rules.loc[state_rules['state'] == state].loc[base_wage >= state_rules['inc_thresh']].iloc[0][1:6]
         
         #find the basewage on the alternate concept
-        base_wage = find_base_wage(wage_concept, base_period)
+        base_wage = find_base_wage(wage_concept, base_period, weeks_worked)
 
 
     wba = calc_weekly_schedule(base_wage, rate, intercept, minimum, maximum)
@@ -124,7 +125,7 @@ def calc_weekly_state(earnings_hist, state):
         return 0
 
 
-def calc_weekly_state_quarterly(q1, q2, q3, q4, states):
+def calc_weekly_state_quarterly(q1, q2, q3, q4, states, weeks_worked):
     '''
     This function is designed to be used with a dataframe. For lists q1,
     q2, q3, q4 which give earnings histories in order for any number of workers and
@@ -136,7 +137,7 @@ def calc_weekly_state_quarterly(q1, q2, q3, q4, states):
         len(q1)
     except:
        assert type(states) is str, "Check that you have one state per worker"  
-       return calc_weekly_state([q1, q2, q3, q4, 0], states)
+       return calc_weekly_state([q1, q2, q3, q4, 0], states, weeks_worked)
     try:
         assert (type(states) != str) & (len(states) > 0) & (len(states) == len(q1)), "Check that you have one state per worker"        
     except: 
@@ -144,5 +145,4 @@ def calc_weekly_state_quarterly(q1, q2, q3, q4, states):
 
     earnings_history = [[q1[i], q2[i], q3[i], q4[i], 0] for i in range(len(q1))]
         
-    return [calc_weekly_state(earnings_history[i], states[i]) for i in range(len(states))]
-    
+    return [calc_weekly_state(earnings_history[i], states[i], weeks_worked[i]) for i in range(len(states))]

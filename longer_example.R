@@ -33,8 +33,7 @@ fips_codes <- maps::state.fips %>%
   distinct() %>%
   bind_rows(tibble(state = c("HI", "AK"),
                    STATEFIP = c(15, 02))) %>%
-  filter(state != "DC",
-         state != "WV")
+  filter(state != "DC")
 
 
 worker_citizen_instate <-
@@ -77,7 +76,8 @@ wages <- wages %>%
                                                        q2_earnings,
                                                        q3_earnings,
                                                        q4_earnings,
-                                                       state) %>% map_dbl(1))
+                                                       state,
+                                                       weeks_worked) %>% map_dbl(1))
 
 
 

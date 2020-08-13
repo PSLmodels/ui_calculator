@@ -33,4 +33,5 @@ income_data['benefits'] = calc_weekly_state_quarterly(
         income_data['q2'],
         income_data['q3'],
         income_data['q4'],
-        income_data['state'])
+        income_data['state'],
+        income_data['weeks_worked'])
