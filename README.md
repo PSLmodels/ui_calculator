@@ -5,10 +5,12 @@ Peter Ganong, Pascal Noel, Peter Robertson and Joseph Vavra
 This code enables you to calculate the level of weekly unemployment insurance (UI) benefits for every state based on an individual's quarterly earnings history. We use this calculator in [Ganong, Noel
 and Vavra (2020)](https://cpb-us-w2.wpmucdn.com/voices.uchicago.edu/dist/1/801/files/2018/08/ganong_noel_vavra_ui_replacement_rate.pdf). 
 
+Update (13-Aug-2020): The calculator has been updated to reflect consulation of alternate documentation to resolve ambiguities in the source "Significant Provisions of State Unemployment Laws" document. Relative to the previous version, the function now expects a `weeks_worked` argument as documented below.
+
 The calculator can be used from Python, R and Stata. Above, you will find minimum working examples for each language.
 
 The core of the calculator is a Python function `calc_weekly_state_quarterly`. 
-* Inputs: `q1_earnings, q2_earnings, q3_earnings, q4_earnings, state`
+* Inputs: `q1_earnings, q2_earnings, q3_earnings, q4_earnings, state`, `weeks_worked`
 * Output: weekly benefit amount (`wba`)
 
 ### minimum working example using Current Population Survey and R
@@ -38,7 +40,8 @@ example %>%
                                                        q2_earnings,
                                                        q3_earnings,
                                                        q4_earnings,
-                                                       state) %>% map_dbl(1))
+                                                       state,
+                                                       weeks_worked) %>% map_dbl(1))
 ```
 
 | Annual earnings | Annual weeks worked | State | Weekly benefits |
