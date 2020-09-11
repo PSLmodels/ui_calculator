@@ -6,12 +6,15 @@ Created on Fri Apr 24 15:09:28 2020
 
 import pandas as pd
 import numpy as np
+import os
+
+base_path = os.path.dirname(os.path.abspath(__file__))
 
 #This CSV contians the parameters needed to caclulate benefits amount
-state_rules = pd.read_csv("source/state_thresholds.csv")
+state_rules = pd.read_csv(base_path + "/state_thresholds.csv")
 
 #This CSV contains the parameters needed to calculate eligibility
-state_eligibility = pd.read_csv("source/state_eligibility.csv")
+state_eligibility = pd.read_csv(base_path + "/state_eligibility.csv")
 
 def calc_weekly_schedule(base_wage, rate, intercept, minimum, maximum):
     '''Finds weekly benefits from wages in a given period, a rate and intercept,
