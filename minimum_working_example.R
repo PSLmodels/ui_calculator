@@ -28,5 +28,6 @@ income_data <- income_data %>% mutate(weekly_earnings = wage / weeks_worked,
                                               q2_earnings,
                                               q3_earnings,
                                               q4_earnings,
-                                              state) %>% map_dbl(1))
+                                              state,
+                                              weeks_worked) %>% map_dbl(1))
 print(income_data)
