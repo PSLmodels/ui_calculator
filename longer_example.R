@@ -74,21 +74,13 @@ rm(worker_citizen_instate)
 #### Add weekly benefits to dataframe ####
 #NB: this code is slow and should be expected to take 1-2 mins
 wages <- wages %>%
-<<<<<<< HEAD
   mutate(benefits_amount =
          ui_calculator$calc_weekly_state_quarterly(q1_earnings,
                                                    q2_earnings,
                                                    q3_earnings,
                                                    q4_earnings,
-                                                   state) %>% map_dbl(1))
-=======
-  mutate(benefits_amount = calc_weekly_state_quarterly(q1_earnings,
-                                                       q2_earnings,
-                                                       q3_earnings,
-                                                       q4_earnings,
-                                                       state,
-                                                       weeks_worked) %>% map_dbl(1))
->>>>>>> master
+                                                   state,
+                                                   weeks_worked) %>% map_dbl(1))
 
 
 
