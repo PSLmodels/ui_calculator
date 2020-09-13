@@ -91,14 +91,10 @@ def find_base_wage(wage_concept, base_period, weeks_worked):
     elif wage_concept == "2fqw":
         base_wage = sum(base_period[-2:])
     elif wage_concept == "ND":
-<<<<<<< HEAD:ui_calculator/ui_calculator.py
         base_wage = (sum((np.sort(base_period))[-2:]) +
-                     0.5*np.sort(base_period)[-3])  
-=======
-        base_wage = sum((np.sort(base_period))[-2:]) + 0.5*np.sort(base_period)[-3]  
+                     0.5*np.sort(base_period)[-3])
     elif wage_concept == "direct_weekly":
         base_wage = sum(base_period)/weeks_worked
->>>>>>> master:source/ui_calculator.py
     else: 
         print("The wage concept " + str(wage_concept) + 
               "from state_thresholds.csv is not defined")
@@ -173,9 +169,5 @@ def calc_weekly_state_quarterly(q1, q2, q3, q4, states, weeks_worked):
 
     earnings_history = [[q1[i], q2[i], q3[i], q4[i], 0] for i in range(nrow)]
         
-<<<<<<< HEAD:ui_calculator/ui_calculator.py
-    return [calc_weekly_state(earnings_history[i], states[i]) 
+    return [calc_weekly_state(earnings_history[i], states[i], weeks_worked[i]) 
             for i in range(nrow)]
-=======
-    return [calc_weekly_state(earnings_history[i], states[i], weeks_worked[i]) for i in range(len(states))]
->>>>>>> master:source/ui_calculator.py
