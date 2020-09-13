@@ -35,7 +35,8 @@ def test_ui_calculator():
         income_data['q2'],
         income_data['q3'],
         income_data['q4'],
-        income_data['state'])
+        income_data['state'],
+        income_data['weeks_worked'])
 
     EXPECTED_BENEFITS = pd.Series([0, 240., 350.], name='benefits')
     pd.testing.assert_series_equal(income_data.benefits, EXPECTED_BENEFITS)
