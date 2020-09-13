@@ -60,9 +60,9 @@ wages <- worker_citizen_instate %>%
          q3_earnings = weeks_worked - 13,
          q4_earnings = weeks_worked) %>%
   mutate_at(vars(matches("q[1-4]_earnings")),
-            ~ case_when(.x > 13 ~ 13*weekly_earnings,
+            ~ case_when(.x > 13 ~ 13 * weekly_earnings,
                         .x < 0 ~ 0,
-                        TRUE ~ .x*weekly_earnings)) %>%
+                        TRUE ~ .x * weekly_earnings)) %>%
   filter(wage >= (7.25 * usual_hours * weeks_worked))
 
 
@@ -85,26 +85,26 @@ wages <- wages %>%
 
 
 ### Benchmark Payments ####
-fit_quantiles_state <- function(tau){
+fit_quantiles_state <- function(tau) {
   wages %>%
-    mutate(eligible = (employment_status == 21 & 
-                       unemployment_duration <= 12 & 
+    mutate(eligible = (employment_status == 21 &
+                       unemployment_duration <= 12 &
                        unemp_reason %in% c(1, 2))) %>%
-    filter( benefits_amount > 0) %>%
-    rq(weekly_earnings ~  eligible + state, tau = tau, weights = weight,
-       data = . ) %>%
+    filter(benefits_amount > 0) %>%
+    rq(weekly_earnings ~ eligible + state, tau = tau, weights = weight,
+       data = .) %>%
     broom::augment(newdata = tibble(state = fips_codes$state, eligible = TRUE))
 }
 
-projected_earnings_dist <- map_dfr(c(seq(0.05, 0.95, 0.05), 0.99), 
+projected_earnings_dist <- map_dfr(c(seq(0.05, 0.95, 0.05), 0.99),
   fit_quantiles_state)
 
 CPS_values <- projected_earnings_dist %>%
   rename(wage = .fitted, tau = .tau) %>%
   pivot_wider(names_from = tau, values_from = wage) %>%
   right_join(wages) %>%
-  filter((employment_status == 21 & 
-          unemployment_duration <= 12 & 
+  filter((employment_status == 21 &
+          unemployment_duration <= 12 &
           unemp_reason %in% c(1, 2)) |
          employment_status == 10,
          benefits_amount > 0) %>%
@@ -117,7 +117,7 @@ CPS_values <- projected_earnings_dist %>%
   group_by(state) %>%
   summarise(aww = Hmisc::wtd.mean(wage / weeks_worked,
                                   weights = weight),
-            awba  = Hmisc::wtd.mean(benefits_amount,
+            awba = Hmisc::wtd.mean(benefits_amount,
                                     weights = weight),
             rr1 = Hmisc::wtd.mean(benefits_amount / weekly_earnings,
                                   weights = weight),
@@ -142,7 +142,7 @@ benchmarks_for_plot <- benchmarks %>%
               values_from = amount)
 
 
-benchmarks_for_plot  %>%
+benchmarks_for_plot %>%
   filter(type %in% c("awba", "aww")) %>%
   ggplot() +
   aes(BAM, CPS) +
