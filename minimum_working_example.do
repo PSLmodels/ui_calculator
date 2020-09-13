@@ -32,7 +32,8 @@ benefits = calc_weekly_state_quarterly(
         Data.get('q2'),
         Data.get('q3'),
         Data.get('q4'),
-        Data.get('state'))
+        Data.get('state'),
+        Data.get('weeks_worked'))
 		
 Data.addVarDouble('benefits')
 
