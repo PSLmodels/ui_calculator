@@ -36,7 +36,7 @@ Finally, some states have different benefits schedules depending on whether the 
 We assume that the base period is the calendar year of 2018. We do this because it matches what we observe in the CPS. This would correspond to the standard base period for an applicant in April, May or June of 2019. The DoL summary document for UI benefit rules says 
 “Almost all qualifying earnings are determined using a base period consisting of the first four of the last five completed CQs. A few States use a different base period. In the following states, more recent earnings may be used in an alternative base period under certain conditions: AK, AR, CA, CO, CT, DE, DC, GA, HI, ID, IL, IA, KS, ME, MD, MA, MI, MN, MT, NE, NV, NH, NJ, NM, NY, NC, OH, OK, OR, PR, RI, SC, SD, UT, VT, VA, VI, WA, WV, and WI.”
 
-We include variables which enforce the following conitions. Most states include only some of these conditions in their eligibility checks, so the majority of values in `state_eligibility.csv` are `0`.
+We include variables which enforce the following conditions. Most states include only some of these conditions in their eligibility checks, so the majority of values in `state_eligibility.csv` are `0`.
 
 Variable | Criterion
 --- | --- 
