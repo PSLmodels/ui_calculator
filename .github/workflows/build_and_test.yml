@@ -18,7 +18,10 @@ jobs:
       - name: Setup Miniconda using Python ${{ matrix.python-version }}
         uses: goanpeca/setup-miniconda@v1
         with:
+          activate-environment: ui_calculator
+          environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
+          auto-activate-base: false
         
       - name: Build
         shell: bash -l {0}

@@ -1,0 +1,6 @@
+name: ui_calculator
+dependencies:
+- numpy
+- pandas
+- pytest
+- setuptools
