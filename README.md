@@ -13,7 +13,7 @@ The calculator can be used from Python, R and Stata. Above, you will find minimu
 
 To install it, run:
 ```
-pip install git+https://github.com/ganong-noel/ui_calculator.git
+pip install git+https://github.com/PSLmodels/ui_calculator.git
 ```
 
 The core of the calculator is a Python function `calc_weekly_state_quarterly`. 
