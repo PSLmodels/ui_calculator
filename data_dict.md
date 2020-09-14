@@ -52,7 +52,7 @@ CT, DE, DC, GA, HI, ID, IL, IA, KS, ME, MD, MA, MI, MN, MT, NE, NV, NH,
 NJ, NM, NY, NC, OH, OK, OR, PR, RI, SC, SD, UT, VT, VA, VI, WA, WV, and
 WI.”
 
-We include variables which enforce the following conitions. Most states
+We include variables which enforce the following conditions. Most states
 include only some of these conditions in their eligibility checks, so
 the majority of values in `state_eligibility.csv` are
 `0`.
@@ -81,4 +81,4 @@ New Hampshire benefits are set to 1% of annual wages. This is the lower bound of
 
 North Dakota has a `wage_concept` which is not common to any other states and is coded as `ND` and described in the `wage_concept` table above.
 
-Alaska, Pennsylvania and Utah all have replacment rates which vary with income as a result of a fixed payment (or deduction) from the benefit. This is coded in the `intercept` column. 
+Alaska, Pennsylvania and Utah all have replacement rates which vary with income as a result of a fixed payment (or deduction) from the benefit. This is coded in the `intercept` column. 

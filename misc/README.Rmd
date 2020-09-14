@@ -64,7 +64,7 @@ The reticulate package can be used to call Python functions from R. The code bel
 ```{r load reticulate}
 library(reticulate)
 use_condaenv()
-source_python("source/ui_calculator.py")
+ui_calculator = import("ui_calculator")
 ```
 
 The function `calc_weekly_state_quarterly(q1, q2, q3, q4, states)` can be used to calculate benefits.
@@ -85,35 +85,42 @@ wages <- wages %>%
          q2_earnings = weeks_worked - 26,
          q3_earnings = weeks_worked - 13,
          q4_earnings = weeks_worked) %>%  
-  mutate_at(vars(matches("q[1-4]_earnings" )), ~ case_when(.x > 13 ~ 13*weekly_earnings,
-                                                           .x < 0 ~ 0,
-                                                           TRUE ~ .x*weekly_earnings)) %>%
-  mutate(benefits_amount = calc_weekly_state_quarterly(q1_earnings,
-                                                       q2_earnings,
-                                                       q3_earnings,
-                                                       q4_earnings,
-                                                       state) %>% map_dbl(1))
+  mutate_at(vars(matches("q[1-4]_earnings" )),
+  ~ case_when(.x > 13 ~ 13*weekly_earnings,
+              .x < 0 ~ 0,
+              TRUE ~ .x*weekly_earnings)) %>%
+  mutate(benefits_amount =
+         ui_calculator$calc_weekly_state_quarterly(q1_earnings,
+                                                   q2_earnings,
+                                                   q3_earnings,
+                                                   q4_earnings,
+                                                   state) %>% map_dbl(1))
 ```
 
-Below we show how the UI benefits we calculate using the calculator on the CPS compare to the benefits that are reported by the Departmented of Labor in their UI Replacement Rates Report. The report uses uses Unemployment Insurance Benefit Accuracy Measurement (BAM) data. Note that the BAM has an average sample size of less than 500 per state, so there is likly sampling variability in both our estimates and the benchmarks. 
+Below we show how the UI benefits we calculate using the calculator on the CPS compare to the benefits that are reported by the Department of Labor in their UI Replacement Rates Report. The report uses uses Unemployment Insurance Benefit Accuracy Measurement (BAM) data. Note that the BAM has an average sample size of less than 500 per state, so there is likly sampling variability in both our estimates and the benchmarks. 
 
 ```{r benchmark, echo=FALSE, message=FALSE, warning=FALSE}
 fit_quantiles_state <- function(tau){
   wages %>%
-    mutate(eligible = (employment_status == 21 & unemployment_duration <= 12 & unemp_reason %in% c(1, 2))) %>%
+    mutate(eligible = (employment_status == 21 & 
+                       unemployment_duration <= 12 & 
+                       unemp_reason %in% c(1, 2))) %>%
     filter( benefits_amount > 0) %>%
-    rq(weekly_earnings ~  eligible + state, tau = tau, weights = weight, data = . ) %>%
-    broom::augment(newdata = tibble(state = fips_codes$state,
-                                    eligible = TRUE))
+    rq(weekly_earnings ~  eligible + state, tau = tau, weights = weight,
+       data = . ) %>%
+    broom::augment(newdata = tibble(state = fips_codes$state, eligible = TRUE))
 }
 
-projected_earnings_dist <- map_dfr(c(seq(0.05, 0.95, 0.05), 0.99), fit_quantiles_state)
+projected_earnings_dist <- map_dfr(c(seq(0.05, 0.95, 0.05), 0.99),
+                                   fit_quantiles_state)
 
 CPS_values <- projected_earnings_dist %>%
   rename(wage = .fitted, tau = .tau) %>%
   pivot_wider(names_from = tau, values_from = wage) %>%
   right_join(wages) %>%
-  filter((employment_status == 21 & unemployment_duration <= 12 & unemp_reason %in% c(1, 2)) |
+  filter((employment_status == 21 &
+          unemployment_duration <= 12 &
+          unemp_reason %in% c(1, 2)) |
            employment_status == 10,
          benefits_amount > 0) %>%
   mutate_at(vars(contains(".")),
@@ -164,8 +171,9 @@ benchmarks_for_plot  %>%
               alpha = 0.8) +
   labs(x = "Benchmarks from Department of Labor",
        y = "Our calculations from Current Population Survey") +
-  facet_wrap(~type, labeller = labeller(type = c(aww = "Average weekly wage",
-                                                 awba = "Average benefit amount")),
+  facet_wrap(~type,
+             labeller = labeller(type = c(aww = "Average weekly wage",
+                                          awba = "Average benefit amount")),
              scales = "free") +
   scale_x_continuous(labels = scales::dollar) +
   scale_y_continuous(labels = scales::dollar)
