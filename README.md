@@ -1,4 +1,4 @@
-[![Build](https://github.com/PSLmodels/ui_calculator/workflows/Build%20and%20test%20[Python%203.6,%203.7,%203.8]/badge.svg)](https://github.com/PSLmodels/ui_calculator/actions?query=workflow%3A%22Build+and+test+%5BPython+3.6%2C+3.7%2C+3.8%5D%22)
+[![Build](https://github.com/PSLmodels/ui_calculator/workflows/Build%20&%20test%20[Python%203.6,%203.7,%203.8]/badge.svg)](https://github.com/PSLmodels/ui_calculator/actions?query=workflow%3A%22Build+&+test+%5BPython+3.6%2C+3.7%2C+3.8%5D%22)
 
 Unemployment insurance benefit calculator
 ================

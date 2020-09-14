@@ -1,4 +1,4 @@
-name: Build and test [Python 3.6, 3.7, 3.8]
+name: Build & test [Python 3.6, 3.7, 3.8]
 
 on: [push, pull_request]
 
