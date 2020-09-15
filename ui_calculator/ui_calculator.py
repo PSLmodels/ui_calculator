@@ -103,7 +103,7 @@ def find_base_wage(wage_concept, base_period, weeks_worked):
             
     return base_wage
 
-def calc_weekly_state(earnings_hist, state, weeks_worked):
+def calc_weekly_state(earnings_hist, state, weeks_worked, flag_ineligible=False):
     '''
     From quarterly earnings history in chronological order, and a two character
     state index calculate the weekly benefits.
@@ -144,10 +144,12 @@ def calc_weekly_state(earnings_hist, state, weeks_worked):
     if is_eligible(base_period, wba, state):
         return wba
     else:
+        if flag_ineligible:
+          return -1
         return 0
 
 
-def calc_weekly_state_quarterly(q1, q2, q3, q4, states, weeks_worked):
+def calc_weekly_state_quarterly(q1, q2, q3, q4, states, weeks_worked, flag_ineligible=False):
     '''
     This function is designed to be used with a dataframe. For lists q1,
     q2, q3, q4 which give earnings histories in order for any number of workers and
@@ -159,7 +161,7 @@ def calc_weekly_state_quarterly(q1, q2, q3, q4, states, weeks_worked):
         nrow = len(q1)
     except:
        assert type(states) is str, "Check that you have one state per worker"  
-       return calc_weekly_state([q1, q2, q3, q4, 0], states, weeks_worked)
+       return calc_weekly_state([q1, q2, q3, q4, 0], states, weeks_worked, flag_ineligible=flag_ineligible)
     try:
         assert ((type(states) != str) & (len(states) > 0) &
                 (len(states) == len(q1))), \
@@ -169,5 +171,5 @@ def calc_weekly_state_quarterly(q1, q2, q3, q4, states, weeks_worked):
 
     earnings_history = [[q1[i], q2[i], q3[i], q4[i], 0] for i in range(nrow)]
         
-    return [calc_weekly_state(earnings_history[i], states[i], weeks_worked[i]) 
+    return [calc_weekly_state(earnings_history[i], states[i], weeks_worked[i], flag_ineligible=flag_ineligible)
             for i in range(nrow)]
